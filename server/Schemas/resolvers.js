@@ -1,38 +1,19 @@
-const typeDefs = `
+const { Query } = require("mongoose");
+const { User } = require("../models");
 
-type User {
-     _id:ID
-    username:String
-    email:String
-    bookCount:Int
-    savedBooks:[Book]
-}
+const resolvers = {
+  Query: {
+    users: async () => {
+      return User.find();
+    },
 
-type Book {
-    bookId:String
-    authors:[String]
-    description:String
-    title:String
-    image:String
-    link:String
-}
-    type Auth {
-        token:ID!
-        user:User
-    }
+    me: async (root, args, context) => {
+      if (context.user) {
+        return User.findById(context.user._id);
+      }
+    },
+  },
+};
 
-    type Query {
-    users:[User]
-    me:User
-    }
 
-    type Mutation {
-    login(email:String!, password:String!):Auth
-    addUser(username:String! ,email:String!, password:String!):Auth
-    saveBook(authors:[String!]!, title:String!, bookId:String!, image:String!, link:String!):User
-    removeBook(bookId: String!):User
-    }
-
-`;
-
-module.exports = typeDefs;
+module.exports = resolvers

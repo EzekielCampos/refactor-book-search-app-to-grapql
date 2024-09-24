@@ -12,7 +12,7 @@ const resolvers = {
       }
     },
 
-    me: async (root, args, context) => {
+    me: async (parent, args, context) => {
       try {
         if (context.user) {
           return User.findById(context.user._id);
@@ -25,7 +25,7 @@ const resolvers = {
   },
 
   Mutation: {
-    login: async (root, { email, password }) => {
+    login: async (parent, { email, password }) => {
       try {
         const user = await User.findOne({ email });
         if (!user) {
@@ -43,7 +43,7 @@ const resolvers = {
         res.status(400).json({ message: error });
       }
     },
-    addUser: async (root, args) => {
+    addUser: async (parent, args) => {
       try {
         const profile = User.create({ ...args });
         const token = token.sign(profile);
@@ -52,7 +52,7 @@ const resolvers = {
         throw error;
       }
     },
-    saveBook: async (root, args, context) => {
+    saveBook: async (parent, args, context) => {
       try {
         return User.findByIdAndUpdate(
           context.user._id,
@@ -69,7 +69,7 @@ const resolvers = {
       }
     },
   },
-  removeBook: async (root, args, context) => {
+  removeBook: async (parent, args, context) => {
     try {
       return User.findByIdAndUpdate(
         context.user._id,

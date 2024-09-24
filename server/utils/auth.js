@@ -1,10 +1,17 @@
-const jwt = require('jsonwebtoken');
-
+require("dotenv").config();
+const jwt = require("jsonwebtoken");
 // set token secret and expiration date
-const secret = 'mysecretsshhhhh';
-const expiration = '2h';
+const secret = process.env.SECRET;
+const expiration = "2h";
+const { GraphQLError } = require('graphql');
+
 
 module.exports = {
+  AuthenticationError: new GraphQLError("Could not authenticate user.", {
+    extensions: {
+      code: "UNAUTHENTICATED",
+    },
+  }),
   // function for our authenticated routes
   authMiddleware: function (req, res, next) {
     // allows token to be sent via  req.query or headers
@@ -12,11 +19,11 @@ module.exports = {
 
     // ["Bearer", "<tokenvalue>"]
     if (req.headers.authorization) {
-      token = token.split(' ').pop().trim();
+      token = token.split(" ").pop().trim();
     }
 
     if (!token) {
-      return res.status(400).json({ message: 'You have no token!' });
+      return res.status(400).json({ message: "You have no token!" });
     }
 
     // verify token and get user data out of it
@@ -24,8 +31,8 @@ module.exports = {
       const { data } = jwt.verify(token, secret, { maxAge: expiration });
       req.user = data;
     } catch {
-      console.log('Invalid token');
-      return res.status(400).json({ message: 'invalid token!' });
+      console.log("Invalid token");
+      return res.status(400).json({ message: "invalid token!" });
     }
 
     // send to next endpoint

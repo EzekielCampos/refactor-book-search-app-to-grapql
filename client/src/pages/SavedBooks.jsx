@@ -15,7 +15,9 @@ import { removeBookId } from "../utils/localStorage";
 const SavedBooks = () => {
   const [userData, setUserData] = useState({});
   const { data, loading, error } = useQuery(GET_ME);
-  const [deleteBook] = useMutation(REMOVE_BOOK)
+  const [deleteBook] = useMutation(REMOVE_BOOK, {
+    refetchQueries: [GET_ME, "me"],
+  });
 
   // Now handle the conditional logic after calling the hook
   if (!Auth.loggedIn()) {
@@ -35,8 +37,8 @@ const SavedBooks = () => {
     }
 
     try {
-      const {data} = await deleteBook({
-        variables:{bookId}
+      const { data } = await deleteBook({
+        variables: { bookId },
       });
       // upon success, remove book's id from localStorage
       removeBookId(bookId);

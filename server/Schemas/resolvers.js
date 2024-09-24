@@ -52,23 +52,37 @@ const resolvers = {
         throw error;
       }
     },
-    saveBook: async (root, args, context)=>{
+    saveBook: async (root, args, context) => {
       try {
-
-        return User.findByIdAndUpdate(context.user._id,
+        return User.findByIdAndUpdate(
+          context.user._id,
           {
-            $addToSet:{savedBooks:{...args}}
+            $addToSet: { savedBooks: { ...args } },
           },
           {
-            new:true,
-            runValidators:true
+            new: true,
+            runValidators: true,
           }
-        )
-        
+        );
       } catch (error) {
-        throw error
-        
+        throw error;
       }
+    },
+  },
+  removeBook: async (root, args, context) => {
+    try {
+      return User.findByIdAndUpdate(
+        context.user._id,
+        {
+          $pull: { savedBooks: { bookId: args.bookId } },
+        },
+        {
+          new: true,
+          runValidators: true,
+        }
+      );
+    } catch (error) {
+      throw error;
     }
   },
 };

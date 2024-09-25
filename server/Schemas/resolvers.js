@@ -4,14 +4,6 @@ const { signToken, AuthenticationError } = require("../utils/auth");
 
 const resolvers = {
   Query: {
-    users: async () => {
-      try {
-        return User.find();
-      } catch (error) {
-        throw error;
-      }
-    },
-
     me: async (parent, args, context) => {
       try {
         if (context.user) {
@@ -19,7 +11,7 @@ const resolvers = {
         }
         throw AuthenticationError;
       } catch (error) {
-        throw error;
+        console.log(error);
       }
     },
   },
@@ -29,61 +21,61 @@ const resolvers = {
       try {
         const user = await User.findOne({ email });
         if (!user) {
-          throw AuthenticationError;
+          throw new AuthenticationError("User not found");
         }
 
         const verifyPw = await user.isCorrectPassword(password);
-
         if (!verifyPw) {
-          throw AuthenticationError;
+          throw new AuthenticationError("Incorrect password");
         }
+
         const token = signToken(user);
         return { token, user };
       } catch (error) {
-        res.status(400).json({ message: error });
+        throw new Error(error.message);
       }
     },
+
     addUser: async (parent, args) => {
       try {
-        const profile = User.create({ ...args });
-        const token = token.sign(profile);
+        const profile = await User.create({ ...args });
+        const token = signToken(profile);
         return { token, profile };
       } catch (error) {
-        throw error;
+        throw new Error(error.message);
       }
     },
+
     saveBook: async (parent, args, context) => {
+      if (!context.user) {
+        throw new AuthenticationError("You need to be logged in!");
+      }
+
       try {
         return User.findByIdAndUpdate(
           context.user._id,
-          {
-            $addToSet: { savedBooks: { ...args } },
-          },
-          {
-            new: true,
-            runValidators: true,
-          }
+          { $addToSet: { savedBooks: { ...args } } },
+          { new: true, runValidators: true }
         );
       } catch (error) {
-        throw error;
+        throw new Error(error.message);
       }
     },
-  },
-  removeBook: async (parent, args, context) => {
-    try {
-      return User.findByIdAndUpdate(
-        context.user._id,
-        {
-          $pull: { savedBooks: { bookId: args.bookId } },
-        },
-        {
-          new: true,
-          runValidators: true,
-        }
-      );
-    } catch (error) {
-      throw error;
-    }
+    removeBook: async (parent, args, context) => {
+      if (!context.user) {
+        throw new AuthenticationError("You need to be logged in!");
+      }
+
+      try {
+        return User.findByIdAndUpdate(
+          context.user._id,
+          { $pull: { savedBooks: { bookId: args.bookId } } },
+          { new: true, runValidators: true }
+        );
+      } catch (error) {
+        throw new Error(error.message);
+      }
+    },
   },
 };
 

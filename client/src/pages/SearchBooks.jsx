@@ -25,8 +25,10 @@ const SearchBooks = () => {
     return () => saveBookIds(savedBookIds);
   });
 
-  const [saveBook] = useMutation(SAVE_BOOK, { refetchQueries: [GET_ME, "me"] });
-
+  const [saveBook] = useMutation(SAVE_BOOK, {
+    refetchQueries: [{ query: GET_ME }], // Ensure to refetch user data after saving a book
+  });
+  
   // create method to search for books and set state on form submit
   const handleFormSubmit = async (event) => {
     event.preventDefault();

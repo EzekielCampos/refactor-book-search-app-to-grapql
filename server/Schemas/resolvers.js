@@ -9,8 +9,9 @@ const resolvers = {
     },
     me: async (parent, args, context) => {
       try {
+        console.log('Context', context.user)
         if (context.user) {
-          return User.findById(context.user._id);
+          return User.findOne({_id:context.user._id});
         }
         throw AuthenticationError;
       } catch (error) {

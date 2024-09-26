@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Container, Card, Button, Row, Col } from "react-bootstrap";
 import { useQuery, useMutation } from "@apollo/client";
 
@@ -15,7 +15,13 @@ import { removeBookId } from "../utils/localStorage";
 const SavedBooks = () => {
   const [userData, setUserData] = useState({});
   const { data, loading, error } = useQuery(GET_ME);
-  const profile = data?.me || {};
+  const user = data?.me || {};
+  console.log(user)
+  useEffect(() => {
+    if (user) {
+      setUserData(user);
+    }
+  }, []); 
 
   const [deleteBook] = useMutation(REMOVE_BOOK, {
     refetchQueries: [GET_ME, "me"],
@@ -27,8 +33,7 @@ const SavedBooks = () => {
   }
 
   if (error) return <div>Error fetching data</div>;
-  // Process the data and update the component
-  setUserData(profile);
+
 
   // create function that accepts the book's mongo _id value as param and deletes the book from the database
   const handleDeleteBook = async (bookId) => {

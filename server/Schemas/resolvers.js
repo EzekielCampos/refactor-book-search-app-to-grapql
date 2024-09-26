@@ -4,6 +4,9 @@ const { signToken, AuthenticationError } = require("../utils/auth");
 
 const resolvers = {
   Query: {
+    users: async (parent, args) => {
+      return User.find({});
+    },
     me: async (parent, args, context) => {
       try {
         if (context.user) {
@@ -23,6 +26,7 @@ const resolvers = {
         if (!user) {
           throw new AuthenticationError("User not found");
         }
+        console.log(user);
 
         const verifyPw = await user.isCorrectPassword(password);
         if (!verifyPw) {
@@ -38,9 +42,10 @@ const resolvers = {
 
     addUser: async (parent, args) => {
       try {
-        const profile = await User.create({ ...args });
-        const token = signToken(profile);
-        return { token, profile };
+        const user = await User.create({ ...args });
+        console.log(user);
+        const token = signToken(user);
+        return { token, user };
       } catch (error) {
         throw new Error(error.message);
       }

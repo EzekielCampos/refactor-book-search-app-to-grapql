@@ -43,14 +43,17 @@ const SearchBooks = () => {
       }
 
       const { items } = await response.json();
+      console.log(items);
 
       const bookData = items.map((book) => ({
         bookId: book.id,
         authors: book.volumeInfo.authors || ["No author to display"],
         title: book.volumeInfo.title,
-        description: book.volumeInfo.description,
+        description: book.volumeInfo.description || "No description",
         image: book.volumeInfo.imageLinks?.thumbnail || "",
+        link:book.volumeInfo.infoLink
       }));
+      console.log(bookData);
 
       setSearchedBooks(bookData);
       setSearchInput("");
@@ -64,6 +67,7 @@ const SearchBooks = () => {
     // find the book in `searchedBooks` state by the matching id
     const bookToSave = searchedBooks.find((book) => book.bookId === bookId);
 
+    console.log(bookToSave);
     // get token
     const token = Auth.loggedIn() ? Auth.getToken() : null;
 
@@ -72,6 +76,7 @@ const SearchBooks = () => {
     }
 
     try {
+      // console.log(bookToSave.description)
       const { data } = await saveBook({
         variables: { ...bookToSave },
       });

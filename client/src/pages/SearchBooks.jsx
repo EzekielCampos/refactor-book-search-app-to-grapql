@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Container, Col, Form, Button, Card, Row } from "react-bootstrap";
 
-import { useMutation } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 
 import { SAVE_BOOK } from "../utils/mutations";
 import { GET_ME } from "../utils/queries";
@@ -28,6 +28,10 @@ const SearchBooks = () => {
   const [saveBook] = useMutation(SAVE_BOOK, {
     refetchQueries: [{ query: GET_ME }], // Ensure to refetch user data after saving a book
   });
+  const { data} = useQuery(GET_ME);
+  const userData = data?.me || {}; // Directly using the data from the query
+
+  console.log(userData.savedBooks)
   
   // create method to search for books and set state on form submit
   const handleFormSubmit = async (event) => {
@@ -82,7 +86,7 @@ const SearchBooks = () => {
       const { data } = await saveBook({
         variables: { ...bookToSave },
       });
-      console.log(data.saveBook)
+      console.log("test",data.saveBook)
       // if book successfully saves to user's account, save book id to state
       setSavedBookIds([...savedBookIds, bookToSave.bookId]);
     } catch (err) {
@@ -142,14 +146,14 @@ const SearchBooks = () => {
                     <Card.Text>{book.description}</Card.Text>
                     {Auth.loggedIn() && (
                       <Button
-                        disabled={savedBookIds?.some(
-                          (savedBookId) => savedBookId === book.bookId
+                        disabled={userData.savedBooks?.some(
+                          (savedBookId) => savedBookId.bookId === book.bookId
                         )}
                         className="btn-block btn-info"
                         onClick={() => handleSaveBook(book.bookId)}
                       >
-                        {savedBookIds?.some(
-                          (savedBookId) => savedBookId === book.bookId
+                        {userData.savedBooks?.some(
+                          (savedBookId) => savedBookId.bookId === book.bookId
                         )
                           ? "This book has already been saved!"
                           : "Save this Book!"}

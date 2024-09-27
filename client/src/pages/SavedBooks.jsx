@@ -1,21 +1,26 @@
 import { Container, Card, Button, Row, Col } from "react-bootstrap";
+// Need both query and mutation hook to make those request
 import { useQuery, useMutation } from "@apollo/client";
-
+// This query will get the current user that is logged in data
 import { GET_ME } from "../utils/queries";
-
+// This mutation will remove a book that was saved in their profile
 import { REMOVE_BOOK } from "../utils/mutations";
 
 import { Navigate } from "react-router-dom";
 
-// import { getMe, deleteBook } from "../utils/API";
 import Auth from "../utils/auth";
 import { removeBookId } from "../utils/localStorage";
 
 const SavedBooks = () => {
+  // Call this query to get all the data of the current logged in user
   const { data, loading, error } = useQuery(GET_ME);
+  // We first verify that the data was successfully queried if not we return an empty object
   const userData = data?.me || {}; // Directly using the data from the query
 
+  // This mutation will update the savedBooks field in the backend
   const [deleteBook] = useMutation(REMOVE_BOOK, {
+    // Since a field is being updated we need to refetch
+    // the user data that was changed
     refetchQueries: [GET_ME, "me"],
   });
 
@@ -28,6 +33,7 @@ const SavedBooks = () => {
 
   // create function that accepts the book's mongo _id value as param and deletes the book from the database
   const handleDeleteBook = async (bookId) => {
+    // Verifies that a user is logged in 
     const token = Auth.loggedIn() ? Auth.getToken() : null;
 
     if (!token) {
@@ -35,11 +41,13 @@ const SavedBooks = () => {
     }
 
     try {
+      // Use the function that was returned from the mutation hook and place the 
+      // bookId that wants to be deleted as the parameter for the mutation
+      // eslint-disable-next-line no-unused-vars
       const { data } = await deleteBook({
         variables: { bookId },
       });
 
-      console.log(data.removeBook);
       // upon success, remove book's id from localStorage
       removeBookId(bookId);
     } catch (err) {

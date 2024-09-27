@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Container, Col, Form, Button, Card, Row } from "react-bootstrap";
-
+// Need both query and mutation hook to make those request
 import { useMutation, useQuery } from "@apollo/client";
 
 import { SAVE_BOOK } from "../utils/mutations";
@@ -28,11 +28,14 @@ const SearchBooks = () => {
   const [saveBook] = useMutation(SAVE_BOOK, {
     refetchQueries: [{ query: GET_ME }], // Ensure to refetch user data after saving a book
   });
-  const { data} = useQuery(GET_ME);
+  // Fetches the current users data to be used
+  const { data } = useQuery(GET_ME);
+  // Need to verify that the query has the necessary information.  This will be
+  // used to verify if a book that shows up in the result has already been saved
+  // as opposed to saving it to local storage.  Therefore the search will be 
+  // unique for each user 
   const userData = data?.me || {}; // Directly using the data from the query
 
-  console.log(userData.savedBooks)
-  
   // create method to search for books and set state on form submit
   const handleFormSubmit = async (event) => {
     event.preventDefault();
@@ -42,26 +45,29 @@ const SearchBooks = () => {
     }
 
     try {
+      // This will take the user input and make a search from the google API
       const response = await searchGoogleBooks(searchInput);
 
       if (!response.ok) {
         throw new Error("something went wrong!");
       }
 
+      // Destructure the results 
       const { items } = await response.json();
-      console.log(items);
 
+      // Get the necessary data from the api call and store them in a variable
       const bookData = items.map((book) => ({
         bookId: book.id,
         authors: book.volumeInfo.authors || ["No author to display"],
         title: book.volumeInfo.title,
         description: book.volumeInfo.description || "No description",
         image: book.volumeInfo.imageLinks?.thumbnail || "",
-        link:book.volumeInfo.infoLink
+        link: book.volumeInfo.infoLink,
       }));
-      console.log(bookData);
 
+      // Update the state for all the results
       setSearchedBooks(bookData);
+      // Clear out the input field
       setSearchInput("");
     } catch (err) {
       console.error(err);
@@ -74,7 +80,7 @@ const SearchBooks = () => {
     const bookToSave = searchedBooks.find((book) => book.bookId === bookId);
 
     console.log(bookToSave);
-    // get token
+    // get token to verify if user is logged in
     const token = Auth.loggedIn() ? Auth.getToken() : null;
 
     if (!token) {
@@ -82,11 +88,12 @@ const SearchBooks = () => {
     }
 
     try {
-      // console.log(bookToSave.description)
+      // Use the function from the mutation hook so save a book to the user's account
       const { data } = await saveBook({
+        // pass the book data as parameters
         variables: { ...bookToSave },
       });
-      console.log("test",data.saveBook)
+      console.log("test", data.saveBook);
       // if book successfully saves to user's account, save book id to state
       setSavedBookIds([...savedBookIds, bookToSave.bookId]);
     } catch (err) {

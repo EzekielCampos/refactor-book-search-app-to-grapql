@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Form, Button, Alert } from "react-bootstrap";
+// useMutation hook will request data from the backend depending on which mutation schema
+// was passed in
 import { useMutation } from "@apollo/client";
 import { ADD_USER } from "../utils/mutations";
 
-// import { createUser } from '../utils/API';
 import Auth from "../utils/auth";
 
 const SignupForm = () => {
@@ -14,6 +15,8 @@ const SignupForm = () => {
     password: "",
   });
 
+  // This calls the hook and returns a function that will be used to
+  // create a new account in the backend from the inputs
   const [addUser] = useMutation(ADD_USER);
   // set state for form validation
   const [validated] = useState(false);
@@ -21,6 +24,7 @@ const SignupForm = () => {
   const [showAlert, setShowAlert] = useState(false);
 
   const handleInputChange = (event) => {
+    // Updates the input fields on change
     const { name, value } = event.target;
     setUserFormData({ ...userFormData, [name]: value });
   };
@@ -36,12 +40,14 @@ const SignupForm = () => {
     }
 
     try {
-
-      const {data} = await addUser({
-        variables:{...userFormData}
-      })
-  
-      console.log(data.addUser.user);
+      // We use the mutation function that was returned from the hook
+      // and pass in all the inputted data as parameters to
+      // be saved into the database
+      const { data } = await addUser({
+        variables: { ...userFormData },
+      });
+      // If the mutation was succesful then we save the toke in local storage
+      // so that the application knows that a user is logged in
       Auth.login(data.addUser.token);
     } catch (err) {
       console.error(err);

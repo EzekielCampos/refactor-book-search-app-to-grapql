@@ -1,20 +1,23 @@
-// see SignupForm.js for comments
 import { useState } from "react";
 import { Form, Button, Alert } from "react-bootstrap";
-
+// Import the useMutation hook to make a request to use the login mutation
 import { useMutation } from "@apollo/client";
+// This is the specific mutation that will be used to verify the user credentials
 import { LOGIN_USER } from "../utils/mutations";
 
-// import { loginUser } from '../utils/API';
 import Auth from "../utils/auth";
 
 const LoginForm = () => {
+  // This is the state that will hanlde the input updates
   const [userFormData, setUserFormData] = useState({ email: "", password: "" });
   const [validated] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
+  // When destructured the loginUser function will be used to send
+  // a request to the backend to verify user credentials
   const [loginUser] = useMutation(LOGIN_USER);
 
   const handleInputChange = (event) => {
+    // Updates the input fields on change
     const { name, value } = event.target;
     setUserFormData({ ...userFormData, [name]: value });
   };
@@ -30,11 +33,14 @@ const LoginForm = () => {
     }
 
     try {
+      // This is the function from the mutation and it will take the inputs
+      // and send them as parameters that are needed for this mutation
       const { data } = await loginUser({
         variables: { ...userFormData },
       });
-
-      console.log(data.login.user);
+      // If the data mutation is successful we set the token that was sent 
+      // back from the backend and place it in the localstorage so that
+      // the app knows a user is logged in
       Auth.login(data.login.token);
     } catch (err) {
       console.error(err);

@@ -1,9 +1,11 @@
 const typeDefs = `
   type User {
+  # This schema will dictate what data can be returned from the corresponding mongo Model
     _id: ID
     username: String
     email: String
     bookCount: Int
+    # This will return an array of the schema Book for all the users saved books
     savedBooks: [Book]
   }
 
@@ -17,6 +19,7 @@ const typeDefs = `
   }
 
   type Auth {
+  # This schema will be used for when we have to send a token and the user data back to the front end
     token: ID!
     user: User
   }
@@ -26,6 +29,7 @@ const typeDefs = `
     me: User
   }
 
+  #The mutations are used for login credentials or to either perfrom a add or delete of a book from the user saved list
   type Mutation {
     login(email: String!, password: String!): Auth
     addUser(username: String!, email: String!, password: String!): Auth

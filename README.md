@@ -33,6 +33,8 @@ To install this project on your computer, fork this repository and clone it or d
 ## Usage
 
 Once the installation is complete, to run the program in development enter the command “npm run develop” to render the React application.  Since there are two servers running, one for Vite and one for GraphQL, you can access the GraphQL playground to test backend request by going to that same localhost link for your front- end and at the end of it  add the endpoint “/graphql”.  In production ensure that you bundle the code by running the command “npm run build” and create a database on MongoDB Atlas. 
+### Deployed Link
+https://refactor-book-search-app-to-grapql.onrender.com/
 ### Screenshot
 ![alt](./client/src/assets/img/search-pg.png)
 ![alt](./client/src/assets/img/saved-pg.png)

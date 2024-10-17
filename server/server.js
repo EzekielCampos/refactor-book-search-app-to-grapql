@@ -5,6 +5,7 @@ const { ApolloServer } = require("@apollo/server");
 const { expressMiddleware } = require("@apollo/server/express4");
 //This function authenticates the JWT token that was sent from the frontend
 const { authMiddleware } = require("./utils/auth");
+const cookieParser = require("cookie-parser");
 const path = require("path");
 const { typeDefs, resolvers } = require("./Schemas");
 
@@ -18,7 +19,7 @@ const PORT = process.env.PORT || 3001;
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  context: { req, res },
+  context: ({ req, res }) => ({ req, res }),
 });
 
 // This function will start the Apollo server
@@ -34,6 +35,7 @@ const startApolloServer = async () => {
       context: authMiddleware,
     })
   );
+  app.use(cookieParser());
   if (process.env.NODE_ENV === "production") {
     app.use(express.static(path.join(__dirname, "../client/dist")));
 

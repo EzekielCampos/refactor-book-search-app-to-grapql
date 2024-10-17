@@ -30,7 +30,7 @@ const resolvers = {
   Mutation: {
     // This mutation will verify that a user has an account and send a token
     // to keep track of the current user
-    login: async (parent, { email, password },{res}) => {
+    login: async (parent, { email, password }, { res }) => {
       try {
         // Find the user by the email
         const user = await User.findOne({ email });
@@ -46,12 +46,12 @@ const resolvers = {
 
         // If the user is verified we create a token by calling the signToken function
         const token = signToken(user);
-        res.cookie("token", token,{
-          httpOnly:true,
-          secure:false,
-          sameSite:'Strict',
-          maxAge:3600000
-        })
+        res.cookie("token", token, {
+          httpOnly: true,
+          secure: false,
+          sameSite: "Strict",
+          maxAge: 3600000,
+        });
         // Send the user data to the front-end and the token to keep track of the current user
         return { user };
       } catch (error) {

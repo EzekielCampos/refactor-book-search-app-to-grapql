@@ -8,16 +8,16 @@ const resolvers = {
     users: async (parent, args) => {
       return User.find({});
     },
-    // The me query will uses the context parameter to fetch the data 
-    // of the user that is currently logged from the token 
+    // The me query will uses the context parameter to fetch the data
+    // of the user that is currently logged from the token
     // This will be used mainly to display there saved books
     me: async (parent, args, context) => {
       try {
-        console.log('Context', context.user)
+        console.log("Context", context.user);
         // Verifies that context is not null
         if (context.user) {
           // If user is logged in send all their data to the front-end
-          return User.findOne({_id:context.user._id});
+          return User.findOne({ _id: context.user._id });
         }
         // If there no user logged in throw an authentification error
         throw AuthenticationError;
@@ -30,7 +30,7 @@ const resolvers = {
   Mutation: {
     // This mutation will verify that a user has an account and send a token
     // to keep track of the current user
-    login: async (parent, { email, password }) => {
+    login: async (parent, { email, password },{res}) => {
       try {
         // Find the user by the email
         const user = await User.findOne({ email });
@@ -46,8 +46,14 @@ const resolvers = {
 
         // If the user is verified we create a token by calling the signToken function
         const token = signToken(user);
+        res.cookie("token", token,{
+          httpOnly:true,
+          secure:false,
+          sameSite:'Strict',
+          maxAge:3600000
+        })
         // Send the user data to the front-end and the token to keep track of the current user
-        return { token, user };
+        return { user };
       } catch (error) {
         throw new Error(error.message);
       }
@@ -58,9 +64,9 @@ const resolvers = {
       try {
         // Take the properties inside of args and use it to create User account
         const user = await User.create({ ...args });
-        // Once the account is created, use that information to create a token 
+        // Once the account is created, use that information to create a token
         const token = signToken(user);
-        // Once the token and user account is created they are signed in 
+        // Once the token and user account is created they are signed in
         return { token, user };
       } catch (error) {
         throw new Error(error.message);
@@ -73,7 +79,7 @@ const resolvers = {
       if (!context.user) {
         throw new AuthenticationError("You need to be logged in!");
       }
-      // From there we look up the account using the id from context 
+      // From there we look up the account using the id from context
       try {
         return User.findByIdAndUpdate(
           context.user._id,
@@ -89,7 +95,7 @@ const resolvers = {
 
     // This mutation removes a book from the user field of savedBooks
     removeBook: async (parent, args, context) => {
-      // First checkts to see if the user is logged in by seeing if 
+      // First checkts to see if the user is logged in by seeing if
       // context has the user property
       if (!context.user) {
         throw new AuthenticationError("You need to be logged in!");

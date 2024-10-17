@@ -1,6 +1,6 @@
 const express = require("express");
 const { ApolloServer } = require("@apollo/server");
-// This will help make the request to the typedef, resolvers, and 
+// This will help make the request to the typedef, resolvers, and
 // authentication of the token
 const { expressMiddleware } = require("@apollo/server/express4");
 //This function authenticates the JWT token that was sent from the frontend
@@ -18,6 +18,7 @@ const PORT = process.env.PORT || 3001;
 const server = new ApolloServer({
   typeDefs,
   resolvers,
+  context: { req, res },
 });
 
 // This function will start the Apollo server
@@ -27,9 +28,12 @@ const startApolloServer = async () => {
   app.use(express.urlencoded({ extended: false }));
   app.use(express.json());
   // This endpoint will take the request and go to the typedef and resolvers to find the corresponding data
-  app.use('/graphql', expressMiddleware(server, {
-    context: authMiddleware
-  }));
+  app.use(
+    "/graphql",
+    expressMiddleware(server, {
+      context: authMiddleware,
+    })
+  );
   if (process.env.NODE_ENV === "production") {
     app.use(express.static(path.join(__dirname, "../client/dist")));
 
@@ -40,7 +44,7 @@ const startApolloServer = async () => {
   app.get("*", (req, res) => {
     res.sendFile(path.join(__dirname, "../client/dist/index.html"));
   });
-// Start the mongo server
+  // Start the mongo server
   db.once("open", () => {
     app.listen(
       PORT,

@@ -20,7 +20,6 @@ const typeDefs = `
 
   type Auth {
   # This schema will be used for when we have to send a token and the user data back to the front end
-    token: ID!
     user: User
   }
 

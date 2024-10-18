@@ -5,12 +5,14 @@ import { useMutation, useQuery } from "@apollo/client";
 
 import { SAVE_BOOK } from "../utils/mutations";
 import { GET_ME } from "../utils/queries";
+import { useGlobalState } from "../utils/GlobalState";
 
-import Auth from "../utils/auth";
 import { searchGoogleBooks } from "../utils/API";
 import { saveBookIds, getSavedBookIds } from "../utils/localStorage";
 
 const SearchBooks = () => {
+  const [state] = useGlobalState();
+  const { loggedIn } = state;
   // create state for holding returned google api data
   const [searchedBooks, setSearchedBooks] = useState([]);
   // create state for holding our search field data
@@ -32,8 +34,8 @@ const SearchBooks = () => {
   const { data } = useQuery(GET_ME);
   // Need to verify that the query has the necessary information.  This will be
   // used to verify if a book that shows up in the result has already been saved
-  // as opposed to saving it to local storage.  Therefore the search will be 
-  // unique for each user 
+  // as opposed to saving it to local storage.  Therefore the search will be
+  // unique for each user
   const userData = data?.me || {}; // Directly using the data from the query
 
   // create method to search for books and set state on form submit
@@ -52,7 +54,7 @@ const SearchBooks = () => {
         throw new Error("something went wrong!");
       }
 
-      // Destructure the results 
+      // Destructure the results
       const { items } = await response.json();
 
       // Get the necessary data from the api call and store them in a variable
@@ -81,9 +83,8 @@ const SearchBooks = () => {
 
     console.log(bookToSave);
     // get token to verify if user is logged in
-    const token = Auth.loggedIn() ? Auth.getToken() : null;
 
-    if (!token) {
+    if (!loggedIn) {
       return false;
     }
 
@@ -151,7 +152,7 @@ const SearchBooks = () => {
                     <Card.Title>{book.title}</Card.Title>
                     <p className="small">Authors: {book.authors}</p>
                     <Card.Text>{book.description}</Card.Text>
-                    {Auth.loggedIn() && (
+                    {loggedIn && (
                       <Button
                         disabled={userData.savedBooks?.some(
                           (savedBookId) => savedBookId.bookId === book.bookId

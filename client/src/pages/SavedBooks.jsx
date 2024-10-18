@@ -7,11 +7,13 @@ import { GET_ME } from "../utils/queries";
 import { REMOVE_BOOK } from "../utils/mutations";
 
 import { Navigate } from "react-router-dom";
+import { useGlobalState } from "../utils/GlobalState";
 
-import Auth from "../utils/auth";
 import { removeBookId } from "../utils/localStorage";
 
 const SavedBooks = () => {
+  const [state] = useGlobalState();
+  const { loggedIn } = state;
   // Call this query to get all the data of the current logged in user
   const { data, loading, error } = useQuery(GET_ME);
   // We first verify that the data was successfully queried if not we return an empty object
@@ -25,7 +27,7 @@ const SavedBooks = () => {
   });
 
   // Now handle the conditional logic after calling the hook
-  if (!Auth.loggedIn()) {
+  if (!loggedIn) {
     return <Navigate to="/" />;
   }
 
@@ -33,15 +35,14 @@ const SavedBooks = () => {
 
   // create function that accepts the book's mongo _id value as param and deletes the book from the database
   const handleDeleteBook = async (bookId) => {
-    // Verifies that a user is logged in 
-    const token = Auth.loggedIn() ? Auth.getToken() : null;
+    // Verifies that a user is logged in
 
-    if (!token) {
+    if (!loggedIn) {
       return false;
     }
 
     try {
-      // Use the function that was returned from the mutation hook and place the 
+      // Use the function that was returned from the mutation hook and place the
       // bookId that wants to be deleted as the parameter for the mutation
       // eslint-disable-next-line no-unused-vars
       const { data } = await deleteBook({

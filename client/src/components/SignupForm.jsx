@@ -5,9 +5,10 @@ import { Form, Button, Alert } from "react-bootstrap";
 import { useMutation } from "@apollo/client";
 import { ADD_USER } from "../utils/mutations";
 
-import Auth from "../utils/auth";
+import { useGlobalState } from "../utils/GlobalState";
 
 const SignupForm = () => {
+  const [state, dispatch] = useGlobalState();
   // set initial form state
   const [userFormData, setUserFormData] = useState({
     username: "",
@@ -46,7 +47,10 @@ const SignupForm = () => {
       const { data } = await addUser({
         variables: { ...userFormData },
       });
-   
+
+      if (data.addUser) {
+        dispatch({ type: "LOGIN" });
+      }
     } catch (err) {
       console.error(err);
       setShowAlert(true);

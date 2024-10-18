@@ -4,10 +4,12 @@ import { Form, Button, Alert } from "react-bootstrap";
 import { useMutation } from "@apollo/client";
 // This is the specific mutation that will be used to verify the user credentials
 import { LOGIN_USER } from "../utils/mutations";
+import { useGlobalState } from "../utils/GlobalState";
 
 // import Auth from "../utils/auth";
 
 const LoginForm = () => {
+  const [dispatch] = useGlobalState();
   // This is the state that will hanlde the input updates
   const [userFormData, setUserFormData] = useState({ email: "", password: "" });
   const [validated] = useState(false);
@@ -39,6 +41,11 @@ const LoginForm = () => {
         variables: { ...userFormData },
       });
       console.log(data);
+      if (data) {
+        dispatch({
+          type: "LOGIN",
+        });
+      }
     } catch (err) {
       console.error(err);
       setShowAlert(true);

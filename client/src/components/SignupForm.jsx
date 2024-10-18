@@ -46,9 +46,7 @@ const SignupForm = () => {
       const { data } = await addUser({
         variables: { ...userFormData },
       });
-      // If the mutation was succesful then we save the toke in local storage
-      // so that the application knows that a user is logged in
-      Auth.login(data.addUser.token);
+   
     } catch (err) {
       console.error(err);
       setShowAlert(true);

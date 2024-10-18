@@ -5,7 +5,7 @@ import { useMutation } from "@apollo/client";
 // This is the specific mutation that will be used to verify the user credentials
 import { LOGIN_USER } from "../utils/mutations";
 
-import Auth from "../utils/auth";
+// import Auth from "../utils/auth";
 
 const LoginForm = () => {
   // This is the state that will hanlde the input updates
@@ -38,10 +38,7 @@ const LoginForm = () => {
       const { data } = await loginUser({
         variables: { ...userFormData },
       });
-      // If the data mutation is successful we set the token that was sent 
-      // back from the backend and place it in the localstorage so that
-      // the app knows a user is logged in
-      Auth.login(data.login.token);
+      console.log(data);
     } catch (err) {
       console.error(err);
       setShowAlert(true);

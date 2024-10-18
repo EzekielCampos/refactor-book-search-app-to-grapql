@@ -28,6 +28,8 @@ const startApolloServer = async () => {
 
   app.use(express.urlencoded({ extended: false }));
   app.use(express.json());
+  app.use(cookieParser());
+
   // This endpoint will take the request and go to the typedef and resolvers to find the corresponding data
   app.use(
     "/graphql",
@@ -35,7 +37,6 @@ const startApolloServer = async () => {
       context: authMiddleware,
     })
   );
-  app.use(cookieParser());
   if (process.env.NODE_ENV === "production") {
     app.use(express.static(path.join(__dirname, "../client/dist")));
 

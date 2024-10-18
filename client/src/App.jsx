@@ -8,12 +8,11 @@ import {
   createHttpLink,
 } from "@apollo/client";
 import { Outlet } from "react-router-dom";
-
+import { GlobalStateProvider } from "./utils/GlobalState";
 const httpLink = createHttpLink({
   uri: "/graphql",
   credentials: "include", // This ensures cookies are sent with the request
 });
-
 
 // The client will be used in the provider so that
 // when a query or mutation is requested it will
@@ -29,8 +28,11 @@ function App() {
   return (
     // All components will be able to make request using this provider
     <ApolloProvider client={client}>
-      <Navbar />
-      <Outlet />
+      <GlobalStateProvider>
+        {" "}
+        <Navbar />
+        <Outlet />
+      </GlobalStateProvider>
     </ApolloProvider>
   );
 }

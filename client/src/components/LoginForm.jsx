@@ -6,6 +6,8 @@ import { useMutation } from "@apollo/client";
 import { LOGIN_USER } from "../utils/mutations";
 import { useGlobalState } from "../utils/GlobalState";
 
+import { setLoginStatus} from "../utils/idb";
+
 // import Auth from "../utils/auth";
 
 const LoginForm = () => {
@@ -47,6 +49,7 @@ const LoginForm = () => {
           type: "LOGIN",
         });
       }
+      await setLoginStatus(true);
     } catch (err) {
       console.error(err);
       setShowAlert(true);

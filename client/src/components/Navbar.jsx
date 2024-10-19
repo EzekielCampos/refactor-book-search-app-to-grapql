@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Navbar, Nav, Container, Modal, Tab } from "react-bootstrap";
 import SignUpForm from "./SignupForm";
@@ -6,6 +6,7 @@ import LoginForm from "./LoginForm";
 import { useGlobalState } from "../utils/GlobalState";
 import { useMutation } from "@apollo/client";
 import { LOGOUT_MUTATION } from "../utils/mutations";
+import { getLoginStatus, removeLoginStatus } from "../utils/idb";
 
 // import Auth from '../utils/auth';
 
@@ -15,6 +16,21 @@ const AppNavbar = () => {
   const [logout] = useMutation(LOGOUT_MUTATION);
   // set modal display state
   const [showModal, setShowModal] = useState(false);
+
+  const result = async ()=>{
+    const result = await getLoginStatus();
+    console.log(result)
+    if (result) {
+      dispatch({
+        type: "LOGIN",
+      });
+    }
+
+  }
+
+  useEffect(() => {
+   result();
+  }, []);
 
   return (
     <>
@@ -30,7 +46,11 @@ const AppNavbar = () => {
                 Search For Books
               </Nav.Link>
               {/* if user is logged in show saved books and logout */}
-              {state.loggedIn ? (
+              {!state.loggedIn ? (
+                <Nav.Link onClick={() => setShowModal(true)}>
+                  Login/Sign Up
+                </Nav.Link>
+              ) : (
                 <>
                   <Nav.Link as={Link} to="/saved">
                     See Your Books
@@ -42,6 +62,7 @@ const AppNavbar = () => {
                         dispatch({
                           type: "LOGOUT",
                         });
+                        await removeLoginStatus();
                       } catch (error) {
                         console.log(error);
                       }
@@ -50,10 +71,6 @@ const AppNavbar = () => {
                     Logout
                   </Nav.Link>
                 </>
-              ) : (
-                <Nav.Link onClick={() => setShowModal(true)}>
-                  Login/Sign Up
-                </Nav.Link>
               )}
             </Nav>
           </Navbar.Collapse>

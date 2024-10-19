@@ -82,3 +82,10 @@ export const REMOVE_BOOK = gql`
     }
   }
 `;
+
+
+export const LOGOUT_MUTATION = gql`
+  mutation Logout {
+    logout
+  }
+`;

@@ -4,12 +4,15 @@ import { Navbar, Nav, Container, Modal, Tab } from "react-bootstrap";
 import SignUpForm from "./SignupForm";
 import LoginForm from "./LoginForm";
 import { useGlobalState } from "../utils/GlobalState";
+import { useMutation } from "@apollo/client";
+import { LOGOUT_MUTATION } from "../utils/mutations";
 
 // import Auth from '../utils/auth';
 
 const AppNavbar = () => {
   const [state, dispatch] = useGlobalState();
   console.log(state);
+  const [logout] = useMutation(LOGOUT_MUTATION);
   // set modal display state
   const [showModal, setShowModal] = useState(false);
 
@@ -33,10 +36,15 @@ const AppNavbar = () => {
                     See Your Books
                   </Nav.Link>
                   <Nav.Link
-                    onClick={() => {
-                      dispatch({
-                        type: "LOGOUT",
-                      });
+                    onClick={async () => {
+                      try {
+                        await logout();
+                        dispatch({
+                          type: "LOGOUT",
+                        });
+                      } catch (error) {
+                        console.log(error);
+                      }
                     }}
                   >
                     Logout

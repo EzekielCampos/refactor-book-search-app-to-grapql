@@ -60,6 +60,10 @@ const resolvers = {
         throw new Error(error.message);
       }
     },
+    logout: (parent, args, context) => {
+      context.res.clearCookie('token', { path: '/' });
+      return true; // Return true to indicate successful logout
+    },
 
     // This mutation is used to create a new user profile
     addUser: async (parent, args, { res }) => {

@@ -37,7 +37,8 @@ const SearchBooks = () => {
   // as opposed to saving it to local storage.  Therefore the search will be
   // unique for each user
   const userData = data?.me || {}; // Directly using the data from the query
-
+  // console.log(data.me);
+  console.log(userData);
   // create method to search for books and set state on form submit
   const handleFormSubmit = async (event) => {
     event.preventDefault();
@@ -45,7 +46,6 @@ const SearchBooks = () => {
     if (!searchInput) {
       return false;
     }
-
     try {
       // This will take the user input and make a search from the google API
       const response = await searchGoogleBooks(searchInput);

@@ -9,7 +9,8 @@ import { useGlobalState } from "../utils/GlobalState";
 // import Auth from "../utils/auth";
 
 const LoginForm = () => {
-  const [dispatch] = useGlobalState();
+  const [state, dispatch] = useGlobalState();
+  console.log(state);
   // This is the state that will hanlde the input updates
   const [userFormData, setUserFormData] = useState({ email: "", password: "" });
   const [validated] = useState(false);
@@ -41,7 +42,7 @@ const LoginForm = () => {
         variables: { ...userFormData },
       });
       console.log(data);
-      if (data) {
+      if (data.login) {
         dispatch({
           type: "LOGIN",
         });

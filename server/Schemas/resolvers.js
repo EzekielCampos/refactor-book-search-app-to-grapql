@@ -11,13 +11,15 @@ const resolvers = {
     // The me query will uses the context parameter to fetch the data
     // of the user that is currently logged from the token
     // This will be used mainly to display there saved books
-    me: async (parent, args, { req }) => {
+    me: async (parent, args, context) => {
       try {
-        console.log("Context", req.user);
+        console.log("Context", context.user);
         // Verifies that context is not null
-        if (req.user) {
+        if (context.user) {
           // If user is logged in send all their data to the front-end
-          return User.findOne({ _id: req.user._id });
+          const user = await  User.findOne({ _id: context.user._id });
+          console.log(user);
+          return user
         }
         // If there no user logged in throw an authentification error
         throw AuthenticationError;
@@ -81,15 +83,15 @@ const resolvers = {
     },
 
     // This saves a book to the user field of savedBooks
-    saveBook: async (parent, args, { req }) => {
+    saveBook: async (parent, args, context) => {
       // Verify that a user is signed by checking the context parameter
-      if (!req.user) {
+      if (!context.user) {
         throw new AuthenticationError("You need to be logged in!");
       }
       // From there we look up the account using the id from context
       try {
         return User.findByIdAndUpdate(
-          req.user._id,
+          context.user._id,
           // we add the new saved books by destructing all of the properties from args so
           // that it will create a book to be saved to this field
           { $addToSet: { savedBooks: { ...args } } },
@@ -101,10 +103,10 @@ const resolvers = {
     },
 
     // This mutation removes a book from the user field of savedBooks
-    removeBook: async (parent, args, { req }) => {
+    removeBook: async (parent, args, context) => {
       // First checkts to see if the user is logged in by seeing if
       // context has the user property
-      if (!req.user) {
+      if (!context.user) {
         throw new AuthenticationError("You need to be logged in!");
       }
 
@@ -114,7 +116,7 @@ const resolvers = {
         // to remove the book by finding the bookId that was passed
         // in the arguments
         return User.findByIdAndUpdate(
-          req.user._id,
+          context.user._id,
           { $pull: { savedBooks: { bookId: args.bookId } } },
           { new: true, runValidators: true }
         );

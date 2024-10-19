@@ -80,19 +80,7 @@ module.exports = {
       console.log("Invalid token");
     }
 
-    // if token can be verified, add the decoded user's data to the request so it can be accessed in the resolver
-    try {
-      // we call jwt.verify (token, secret, optional expiration time)
-      // If token is valid it will return the object that is in the token
-      // If it throws an errro we do not add a user property to the request
-      // object
-      const { data } = jwt.verify(token, secret, { maxAge: expiration });
-      // Create property for user and set it for the data from the token
-      req.user = data;
-    } catch {
-      console.log("Invalid token");
-    }
-
+    console.log(req.user);
     // return the request object so it can be passed to the resolver as `context`
     return req;
   },

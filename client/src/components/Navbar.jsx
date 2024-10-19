@@ -9,6 +9,7 @@ import { useGlobalState } from "../utils/GlobalState";
 
 const AppNavbar = () => {
   const [state, dispatch] = useGlobalState();
+  console.log(state);
   // set modal display state
   const [showModal, setShowModal] = useState(false);
 

@@ -13,15 +13,16 @@ module.exports = {
       code: "UNAUTHENTICATED",
     },
   }),
-  // function for our authenticated routes that will be used as context
+
   authMiddleware: function ({ req }) {
     // allows token to be sent via req.body, req.query, or headers
-    let token = req.body.token || req.query.token || req.headers.authorization;
-    // We split the token string into an array and return actual token
-    if (req.headers.authorization) {
-      token = token.split(" ")[1];
+    let token = req.cookies.token;
+    if (!token) {
+      token =
+        req.body.token ||
+        req.query.token ||
+        req.headers.authorization?.split(" ")[1];
     }
-
     if (!token) {
       return req;
     }
@@ -30,19 +31,6 @@ module.exports = {
       // we call jwt.verify (token, secret, optional expiration time)
       // If token is valid it will return the object that is in the token
       // If it throws an error we do not add a user property to the request
-      // object
-      const { data } = jwt.verify(token, secret, { maxAge: expiration });
-      // Create property for user and set it for the data from the token
-      req.user = data;
-    } catch {
-      console.log("Invalid token");
-    }
-
-    // if token can be verified, add the decoded user's data to the request so it can be accessed in the resolver
-    try {
-      // we call jwt.verify (token, secret, optional expiration time)
-      // If token is valid it will return the object that is in the token
-      // If it throws an errro we do not add a user property to the request
       // object
       const { data } = jwt.verify(token, secret, { maxAge: expiration });
       // Create property for user and set it for the data from the token

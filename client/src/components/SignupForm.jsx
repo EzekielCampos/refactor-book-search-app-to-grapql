@@ -4,10 +4,12 @@ import { Form, Button, Alert } from "react-bootstrap";
 // was passed in
 import { useMutation } from "@apollo/client";
 import { ADD_USER } from "../utils/mutations";
+import { setLoginStatus } from "../utils/idb";
 
-import Auth from "../utils/auth";
+import { useGlobalState } from "../utils/GlobalState";
 
-const SignupForm = () => {
+const SignupForm = ({handleModalClose}) => {
+  const [state, dispatch] = useGlobalState();
   // set initial form state
   const [userFormData, setUserFormData] = useState({
     username: "",
@@ -46,9 +48,12 @@ const SignupForm = () => {
       const { data } = await addUser({
         variables: { ...userFormData },
       });
-      // If the mutation was succesful then we save the toke in local storage
-      // so that the application knows that a user is logged in
-      Auth.login(data.addUser.token);
+
+      if (data.addUser) {
+        dispatch({ type: "LOGIN" });
+      }
+      await setLoginStatus(true);
+      handleModalClose();
     } catch (err) {
       console.error(err);
       setShowAlert(true);

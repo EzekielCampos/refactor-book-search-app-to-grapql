@@ -1,21 +1,27 @@
 import { Container, Card, Button, Row, Col } from "react-bootstrap";
+import { useState } from "react";
 // Need both query and mutation hook to make those request
 import { useQuery, useMutation } from "@apollo/client";
+import { useEffect } from "react";
 // This query will get the current user that is logged in data
 import { GET_ME } from "../utils/queries";
 // This mutation will remove a book that was saved in their profile
 import { REMOVE_BOOK } from "../utils/mutations";
 
 import { Navigate } from "react-router-dom";
+import { useGlobalState } from "../utils/GlobalState";
 
-import Auth from "../utils/auth";
 import { removeBookId } from "../utils/localStorage";
+import { getLoginStatus } from "../utils/idb";
 
 const SavedBooks = () => {
-  // Call this query to get all the data of the current logged in user
-  const { data, loading, error } = useQuery(GET_ME);
+  const [state, dispatch] = useGlobalState();
+  const { loggedIn } = state;
+  const [loadingLoginStatus, setLoadingLoginStatus] = useState(true); // Add a loading state for login status  // Call this query to get all the data of the current logged in user
+  const { data, loading, error, refetch } = useQuery(GET_ME);
   // We first verify that the data was successfully queried if not we return an empty object
   const userData = data?.me || {}; // Directly using the data from the query
+  console.log(userData);
 
   // This mutation will update the savedBooks field in the backend
   const [deleteBook] = useMutation(REMOVE_BOOK, {
@@ -23,9 +29,26 @@ const SavedBooks = () => {
     // the user data that was changed
     refetchQueries: [GET_ME, "me"],
   });
+  // Function to check login status from indexDB
+  const checkLoginStatus = async () => {
+    const result = await getLoginStatus();
+    if (result) {
+      dispatch({
+        type: "LOGIN",
+      });
+    }
+    setLoadingLoginStatus(false); // Set loadingLoginStatus to false once checked
+  };
 
+  useEffect(() => {
+    checkLoginStatus();
+    refetch();
+  }, []);
+  if (loadingLoginStatus) {
+    return <h2>Checking login status...</h2>; // Show loading message while checking
+  }
   // Now handle the conditional logic after calling the hook
-  if (!Auth.loggedIn()) {
+  if (!loggedIn) {
     return <Navigate to="/" />;
   }
 
@@ -33,15 +56,14 @@ const SavedBooks = () => {
 
   // create function that accepts the book's mongo _id value as param and deletes the book from the database
   const handleDeleteBook = async (bookId) => {
-    // Verifies that a user is logged in 
-    const token = Auth.loggedIn() ? Auth.getToken() : null;
+    // Verifies that a user is logged in
 
-    if (!token) {
+    if (!loggedIn) {
       return false;
     }
 
     try {
-      // Use the function that was returned from the mutation hook and place the 
+      // Use the function that was returned from the mutation hook and place the
       // bookId that wants to be deleted as the parameter for the mutation
       // eslint-disable-next-line no-unused-vars
       const { data } = await deleteBook({

@@ -4,10 +4,14 @@ import { Form, Button, Alert } from "react-bootstrap";
 import { useMutation } from "@apollo/client";
 // This is the specific mutation that will be used to verify the user credentials
 import { LOGIN_USER } from "../utils/mutations";
+import { useGlobalState } from "../utils/GlobalState";
 
-import Auth from "../utils/auth";
+import { setLoginStatus } from "../utils/idb";
 
-const LoginForm = () => {
+// import Auth from "../utils/auth";
+
+const LoginForm = ({ handleModalClose }) => {
+  const [state, dispatch] = useGlobalState();
   // This is the state that will hanlde the input updates
   const [userFormData, setUserFormData] = useState({ email: "", password: "" });
   const [validated] = useState(false);
@@ -38,10 +42,13 @@ const LoginForm = () => {
       const { data } = await loginUser({
         variables: { ...userFormData },
       });
-      // If the data mutation is successful we set the token that was sent 
-      // back from the backend and place it in the localstorage so that
-      // the app knows a user is logged in
-      Auth.login(data.login.token);
+      if (data.login) {
+        dispatch({
+          type: "LOGIN",
+        });
+      }
+      await setLoginStatus(true);
+      handleModalClose();
     } catch (err) {
       console.error(err);
       setShowAlert(true);

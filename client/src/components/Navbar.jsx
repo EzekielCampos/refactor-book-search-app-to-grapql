@@ -7,29 +7,35 @@ import { useGlobalState } from "../utils/GlobalState";
 import { useMutation } from "@apollo/client";
 import { LOGOUT_MUTATION } from "../utils/mutations";
 import { getLoginStatus, removeLoginStatus } from "../utils/idb";
-
+import { useApolloClient } from "@apollo/client";
 // import Auth from '../utils/auth';
 
 const AppNavbar = () => {
   const [state, dispatch] = useGlobalState();
-  console.log(state);
   const [logout] = useMutation(LOGOUT_MUTATION);
   // set modal display state
   const [showModal, setShowModal] = useState(false);
+  const apolloClient = useApolloClient();
 
-  const result = async ()=>{
+  const result = async () => {
     const result = await getLoginStatus();
-    console.log(result)
     if (result) {
       dispatch({
         type: "LOGIN",
       });
     }
-  }
+  };
 
   useEffect(() => {
-   result();
+    result();
   }, []);
+
+  const clearUserDataFromCache = () => {
+    apolloClient.cache.evict({
+      fieldName: "me", // This clears the "me" field from cache
+    });
+    apolloClient.cache.gc(); // Garbage collection to remove the evicted data
+  };
 
   return (
     <>
@@ -61,6 +67,7 @@ const AppNavbar = () => {
                         dispatch({
                           type: "LOGOUT",
                         });
+                        clearUserDataFromCache();
                         await removeLoginStatus();
                       } catch (error) {
                         console.log(error);

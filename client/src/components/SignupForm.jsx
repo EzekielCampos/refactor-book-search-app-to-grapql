@@ -4,10 +4,11 @@ import { Form, Button, Alert } from "react-bootstrap";
 // was passed in
 import { useMutation } from "@apollo/client";
 import { ADD_USER } from "../utils/mutations";
+import { setLoginStatus } from "../utils/idb";
 
 import { useGlobalState } from "../utils/GlobalState";
 
-const SignupForm = () => {
+const SignupForm = ({handleModalClose}) => {
   const [state, dispatch] = useGlobalState();
   // set initial form state
   const [userFormData, setUserFormData] = useState({
@@ -51,6 +52,8 @@ const SignupForm = () => {
       if (data.addUser) {
         dispatch({ type: "LOGIN" });
       }
+      await setLoginStatus(true);
+      handleModalClose();
     } catch (err) {
       console.error(err);
       setShowAlert(true);

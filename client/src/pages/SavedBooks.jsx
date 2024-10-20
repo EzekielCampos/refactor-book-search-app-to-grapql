@@ -18,9 +18,10 @@ const SavedBooks = () => {
   const [state, dispatch] = useGlobalState();
   const { loggedIn } = state;
   const [loadingLoginStatus, setLoadingLoginStatus] = useState(true); // Add a loading state for login status  // Call this query to get all the data of the current logged in user
-  const { data, loading, error } = useQuery(GET_ME);
+  const { data, loading, error, refetch } = useQuery(GET_ME);
   // We first verify that the data was successfully queried if not we return an empty object
   const userData = data?.me || {}; // Directly using the data from the query
+  console.log(userData);
 
   // This mutation will update the savedBooks field in the backend
   const [deleteBook] = useMutation(REMOVE_BOOK, {
@@ -41,6 +42,7 @@ const SavedBooks = () => {
 
   useEffect(() => {
     checkLoginStatus();
+    refetch();
   }, []);
   if (loadingLoginStatus) {
     return <h2>Checking login status...</h2>; // Show loading message while checking

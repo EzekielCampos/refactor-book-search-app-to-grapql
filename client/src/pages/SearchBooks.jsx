@@ -37,8 +37,7 @@ const SearchBooks = () => {
   // as opposed to saving it to local storage.  Therefore the search will be
   // unique for each user
   const userData = data?.me || {}; // Directly using the data from the query
-  // console.log(data.me);
-  console.log(userData);
+  
   // create method to search for books and set state on form submit
   const handleFormSubmit = async (event) => {
     event.preventDefault();
@@ -81,7 +80,6 @@ const SearchBooks = () => {
     // find the book in `searchedBooks` state by the matching id
     const bookToSave = searchedBooks.find((book) => book.bookId === bookId);
 
-    console.log(bookToSave);
     // get token to verify if user is logged in
 
     if (!loggedIn) {

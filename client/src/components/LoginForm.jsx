@@ -12,7 +12,6 @@ import { setLoginStatus } from "../utils/idb";
 
 const LoginForm = ({ handleModalClose }) => {
   const [state, dispatch] = useGlobalState();
-  console.log(state);
   // This is the state that will hanlde the input updates
   const [userFormData, setUserFormData] = useState({ email: "", password: "" });
   const [validated] = useState(false);
@@ -43,7 +42,6 @@ const LoginForm = ({ handleModalClose }) => {
       const { data } = await loginUser({
         variables: { ...userFormData },
       });
-      console.log(data);
       if (data.login) {
         dispatch({
           type: "LOGIN",

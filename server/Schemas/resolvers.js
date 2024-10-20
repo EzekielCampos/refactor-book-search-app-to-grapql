@@ -13,12 +13,10 @@ const resolvers = {
     // This will be used mainly to display there saved books
     me: async (parent, args, context) => {
       try {
-        console.log("Context", context.user);
         // Verifies that context is not null
         if (context.user) {
           // If user is logged in send all their data to the front-end
           const user = await  User.findOne({ _id: context.user._id });
-          console.log(user);
           return user
         }
         // If there no user logged in throw an authentification error

@@ -25,7 +25,6 @@ const AppNavbar = () => {
         type: "LOGIN",
       });
     }
-
   }
 
   useEffect(() => {

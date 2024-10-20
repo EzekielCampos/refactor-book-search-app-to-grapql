@@ -1,6 +1,8 @@
 import { Container, Card, Button, Row, Col } from "react-bootstrap";
+import { useState } from "react";
 // Need both query and mutation hook to make those request
 import { useQuery, useMutation } from "@apollo/client";
+import { useEffect } from "react";
 // This query will get the current user that is logged in data
 import { GET_ME } from "../utils/queries";
 // This mutation will remove a book that was saved in their profile
@@ -10,11 +12,12 @@ import { Navigate } from "react-router-dom";
 import { useGlobalState } from "../utils/GlobalState";
 
 import { removeBookId } from "../utils/localStorage";
+import { getLoginStatus } from "../utils/idb";
 
 const SavedBooks = () => {
-  const [state] = useGlobalState();
+  const [state, dispatch] = useGlobalState();
   const { loggedIn } = state;
-  // Call this query to get all the data of the current logged in user
+  const [loadingLoginStatus, setLoadingLoginStatus] = useState(true); // Add a loading state for login status  // Call this query to get all the data of the current logged in user
   const { data, loading, error } = useQuery(GET_ME);
   // We first verify that the data was successfully queried if not we return an empty object
   const userData = data?.me || {}; // Directly using the data from the query
@@ -25,7 +28,23 @@ const SavedBooks = () => {
     // the user data that was changed
     refetchQueries: [GET_ME, "me"],
   });
+  // Function to check login status from indexDB
+  const checkLoginStatus = async () => {
+    const result = await getLoginStatus();
+    if (result) {
+      dispatch({
+        type: "LOGIN",
+      });
+    }
+    setLoadingLoginStatus(false); // Set loadingLoginStatus to false once checked
+  };
 
+  useEffect(() => {
+    checkLoginStatus();
+  }, []);
+  if (loadingLoginStatus) {
+    return <h2>Checking login status...</h2>; // Show loading message while checking
+  }
   // Now handle the conditional logic after calling the hook
   if (!loggedIn) {
     return <Navigate to="/" />;

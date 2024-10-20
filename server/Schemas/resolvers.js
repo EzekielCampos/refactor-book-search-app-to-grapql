@@ -46,11 +46,12 @@ const resolvers = {
 
         // If the user is verified we create a token by calling the signToken function
         const token = signToken(user);
-        res.cookie("token", token, {
+        res.cookie('token', token, {
           httpOnly: true,
-          secure: false,
-          sameSite: "Strict",
+          secure: process.env.NODE_ENV === 'production',  // Only in production
+          sameSite: 'None',  // Required for cross-origin requests
           maxAge: 3600000,
+
         });
         // Send the user data to the front-end and the token to keep track of the current user
         return { user };

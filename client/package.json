@@ -12,6 +12,7 @@
   "dependencies": {
     "@apollo/client": "^3.7.14",
     "bootstrap": "^5.2.3",
+    "dotenv": "^16.4.5",
     "graphql": "^16.6.0",
     "idb": "^8.0.0",
     "jwt-decode": "^3.1.2",

@@ -10,8 +10,11 @@ import {
 import { Outlet } from "react-router-dom";
 import { GlobalStateProvider } from "./utils/GlobalState";
 const httpLink = createHttpLink({
-  uri: "/graphql",
-  credentials: "include", // This ensures cookies are sent with the request
+  uri:
+    process.env.NODE_ENV === "production"
+      ? "https://refactor-book-search-app-to-grapql.onrender.com/graphql" // Production backend URL
+      : "/graphql", // Dev server will proxy this to your local backend
+  credentials: "include", // Ensure cookies are included
 });
 
 // The client will be used in the provider so that

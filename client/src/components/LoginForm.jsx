@@ -6,11 +6,11 @@ import { useMutation } from "@apollo/client";
 import { LOGIN_USER } from "../utils/mutations";
 import { useGlobalState } from "../utils/GlobalState";
 
-import { setLoginStatus} from "../utils/idb";
+import { setLoginStatus } from "../utils/idb";
 
 // import Auth from "../utils/auth";
 
-const LoginForm = () => {
+const LoginForm = ({ handleModalClose }) => {
   const [state, dispatch] = useGlobalState();
   console.log(state);
   // This is the state that will hanlde the input updates
@@ -50,6 +50,7 @@ const LoginForm = () => {
         });
       }
       await setLoginStatus(true);
+      handleModalClose();
     } catch (err) {
       console.error(err);
       setShowAlert(true);
